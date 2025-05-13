@@ -1,32 +1,39 @@
-import InputField from "@/common/InputField";
-import { login } from "@/services/auth";
-import { AppDispatch } from "@/store/store";
-import React, { useState } from "react"
+import React, { useState } from "react";
+import {
+    Box,
+    Button,
+    TextField,
+    Typography,
+    Alert,
+    Paper,
+    Link,
+} from "@mui/material";
 import { useDispatch } from "react-redux";
-// import { useNavigate } from "react-router-dom";
+import { AppDispatch } from "@/store/store";
+import { login } from "@/services/auth";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm: React.FC = () => {
-
-    // const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
-        userName: '',
-        password: '',
+        userName: "",
+        password: "",
     });
 
-    const [error, setError] = useState('');
-    const [success, _] = useState('');
+    const [error, setError] = useState("");
+    const [success, _] = useState("");
 
-    const handleInputChange = (e:React.ChangeEvent<HTMLInputElement>) : void => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (e :React.FormEvent<HTMLFormElement>) => {
-
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (!formData.userName || !formData.password) {
-            setError('Please fill out all fields');
+            setError("Please fill out all fields");
             return;
         }
 
@@ -34,39 +41,84 @@ const LoginForm: React.FC = () => {
     };
 
     return (
-        <div className="h-[100vh] flex items-center justify-center md:bg-gray-100">
-            <form onSubmit={handleSubmit} className="bg-gray-100 md:bg-white p-3 md:p-6 rounded-lg shadow-md w-full max-w-md">
-                <h2 className="text-2xl font-semibold mb-6 text-gray-800 text-center">Sign Up</h2>
+        <Box
+            minHeight="100vh"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            bgcolor="#f3f4f6"
+            px={2}
+        >
+            <Paper elevation={3} sx={{ p: 4, maxWidth: 400, width: "100%" }}>
+                <Typography variant="h5" fontWeight={600} textAlign="center" gutterBottom>
+                    Login to Your Account
+                </Typography>
 
-                {error && <div className="text-red-500 mb-4">{error}</div>}
-                {success && <div className="text-green-500 mb-4">{success}</div>}
+                <Typography variant="body2" textAlign="center" color="text.secondary" mb={2}>
+                    Enter your credentials to continue
+                </Typography>
 
-                <InputField
-                    label="Username"
-                    type="text"
-                    name="userName"
-                    value={formData.userName}
-                    onChange={handleInputChange}
-                />
+                {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+                {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
+                <form onSubmit={handleSubmit}>
+                    <TextField
+                        label="Username"
+                        name="userName"
+                        fullWidth
+                        margin="normal"
+                        value={formData.userName}
+                        onChange={handleInputChange}
+                        autoComplete="username"
+                    />
 
-                <InputField
-                    label="Password"
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                />
+                    <TextField
+                        label="Password"
+                        name="password"
+                        type="password"
+                        fullWidth
+                        margin="normal"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        autoComplete="current-password"
+                    />
 
-                <button
-                    type="submit"
-                    className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-200"
-                >
-                    Login
-                </button>
-            </form>
-        </div>
-    )
-}
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                            mt: 3,
+                            borderRadius: "999px",
+                            py: 1.5,
+                            fontWeight: 600,
+                            textTransform: "none",
+                            boxShadow: "none",
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                                transform: "scale(1.02)",
+                            },
+                        }}
+                    >
+                        Login
+                    </Button>
+                </form>
+
+                <Box mt={3} textAlign="center">
+                    <Typography variant="body2" color="text.secondary">
+                        Not registered?{" "}
+                        <Link component="button"
+                            onClick={() => navigate("/register")}
+                            underline="hover"
+                            sx={{ color: '#1976d2', cursor: 'pointer' }}>
+                            Create an account
+                        </Link>
+                    </Typography>
+                </Box>
+            </Paper>
+        </Box>
+    );
+};
 
 export default LoginForm;

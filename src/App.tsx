@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import { Route, Routes } from 'react-router-dom';
 import LoginForm from './features/auth/components/LoginForm';
 import RegisterForm from './features/auth/components/RegisterForm';
+import ResearchSearchApp from './pages/ResearchSearchApp';
 
 const App: React.FC = () => {
   const { authState } = useSelector((state: RootState) => state.user);
@@ -57,7 +58,8 @@ const App: React.FC = () => {
           </>
         ) : (
           <>
-            <Home />
+            {/* <Home /> */}
+            <ResearchSearchApp/>
           </>
         )
       }
