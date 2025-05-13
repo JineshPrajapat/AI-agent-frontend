@@ -1,0 +1,68 @@
+import React, { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from './store/store';
+import { setUser } from './store/reducers/userReducer';
+import { AuthStates } from './utils/enums';
+import Loader from './common/Loader';
+import Landing from './pages/Landing';
+import Home from './pages/Home';
+import { Route, Routes } from 'react-router-dom';
+import LoginForm from './features/auth/components/LoginForm';
+import RegisterForm from './features/auth/components/RegisterForm';
+
+const App: React.FC = () => {
+  const { authState } = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const isInitialized = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (isInitialized.current) return;
+    isInitialized.current = true;
+
+    const initializeAuth = async () => {
+      const userToken = localStorage.getItem("accessToken");
+
+      if (!userToken) {
+        dispatch(setUser({ authState: AuthStates.IDLE }));
+      }
+
+      if (userToken) {
+        try {
+          // Make API call or any other logic
+          dispatch(setUser({ authState: AuthStates.AUTHENTICATED }));
+        } catch {
+          localStorage.removeItem("accessToken");
+          dispatch(setUser({ authState: AuthStates.IDLE }));
+        }
+      }
+    };
+
+    initializeAuth();
+  }, [dispatch]);
+
+
+  if (authState === AuthStates.INITIALIZING) return <Loader />;
+
+  return (
+    <>
+      {authState !== AuthStates.AUTHENTICATED ?
+        (
+          <>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<LoginForm/>} />
+              <Route path="/register" element={<RegisterForm />} />
+            </Routes>
+          </>
+        ) : (
+          <>
+            <Home />
+          </>
+        )
+      }
+    </>
+  );
+};
+
+export default App;
