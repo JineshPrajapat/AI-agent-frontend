@@ -6,7 +6,7 @@ interface Token {
 }
 // import.meta.env.VITE_BACKEND_BASE_URL ||
 const userApi = axios.create({
-    baseURL:  "http://127.0.0.1:5000/api",
+    baseURL: import.meta.env.VITE_BACKEND_BASE_URL,
     withCredentials: true,
 });
 
@@ -29,14 +29,14 @@ userApi.interceptors.response.use(
 
             try {
                 const refreshToken = localStorage.getItem("refreshToken");
-                if(!refreshToken)
+                if (!refreshToken)
                     throw new Error("Refresh Token not available. Please log in again.");
 
                 console.log("Attempting token refresh");
-                const {data} = await axios.post<Token>(
+                const { data } = await axios.post<Token>(
                     `${import.meta.env.VITE_BACKEND_BASE_URL}/auth/refresh-token`,
                     {},
-                    {withCredentials : true}
+                    { withCredentials: true }
                 );
                 console.log("Token refreshed:", data);
                 localStorage.setItem("accessToken", data.accessToken);

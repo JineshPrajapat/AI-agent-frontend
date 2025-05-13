@@ -9,8 +9,11 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
-  server:{
-    host:"0.0.0.0"
+  optimizeDeps: {
+    include: ['@mui/material/Tooltip', '@emotion/styled', '@mui/material/Unstable_Grid2'],
+  },
+  server: {
+    host: "0.0.0.0"
   },
   resolve: {
     alias: {
