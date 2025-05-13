@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   Box, 
   Typography, 
@@ -20,7 +20,7 @@ import {
   useTheme,
   alpha
 } from '@mui/material';
-import { Search, MoreHorizontal, FileText, Download, Eye } from 'lucide-react';
+import { Search, FileText, Download, Eye } from 'lucide-react';
 
 // Types
 interface ResearchPaper {

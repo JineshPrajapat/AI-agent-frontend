@@ -5,7 +5,6 @@ import { setUser } from './store/reducers/userReducer';
 import { AuthStates } from './utils/enums';
 import Loader from './common/Loader';
 import Landing from './pages/Landing';
-import Home from './pages/Home';
 import { Route, Routes } from 'react-router-dom';
 import LoginForm from './features/auth/components/LoginForm';
 import RegisterForm from './features/auth/components/RegisterForm';
