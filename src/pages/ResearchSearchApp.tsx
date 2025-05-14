@@ -15,6 +15,16 @@ export default function ResearchSearchApp() {
     } = usePapers();
 
     const [query, setQuery] = useState('');
+  const [_isChatOpen, setIsChatOpen] = useState(false);
+
+
+    const handleChatOpen = () => {
+    if (selectedCount > 0) {
+      setIsChatOpen(true);
+    } else {
+      alert("Please select at least one paper to start a chat.");
+    }
+  };
 
     return (
         <Box maxWidth="1400px" mx="auto" p={3}>
@@ -36,13 +46,14 @@ export default function ResearchSearchApp() {
                     <Fade in timeout={1000} mountOnEnter unmountOnExit>
                         <div>
                             <Box>
-                                <Typography variant="h6">Results ({papers.length})</Typography>
+                                <Typography variant="h6">Results ({papers?.length})</Typography>
                                 {selectedCount > 0 && (
                                     <Box display="flex" justifyContent="flex-end">
                                         <Button
                                             startIcon={<FileText />}
                                             variant="contained"
                                             sx={{ my: 2 }}
+                                            onClick={handleChatOpen}
                                         >
                                             Chat with Selected ({selectedCount})
                                         </Button>

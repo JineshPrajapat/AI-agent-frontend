@@ -1,25 +1,46 @@
 import { useState } from 'react';
-import { INITIAL_DATA } from '../data/samplePapers';
 import { ResearchPaper } from '../utils/types/research';
+import { searchPapers } from '@/services/paperApi';
+// import { INITIAL_DATA } from '@/data/samplePapers';
+// hooks/usePapers.ts
 
 export function usePapers() {
-  const [papers, setPapers] = useState<ResearchPaper[]>(INITIAL_DATA);
+  const [papers, setPapers] = useState<ResearchPaper[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchPerformed, setSearchPerformed] = useState(false);
-  const [summary, setSummary] = useState<string[]>([]);
+  const [searchPerformed, setSearchPerformed] = useState(true);
+  const [summary, setSummary] = useState<string>('');
 
   const search = async (query: string) => {
     setLoading(true);
-    await new Promise(res => setTimeout(res, 1200));
-    const updated = INITIAL_DATA.map(p => ({ ...p, selected: false }));
-    setPapers(updated);
-    setSearchPerformed(true);
-    setLoading(false);
-    setSummary([
-      `Found ${updated.length} papers for "${query}".`,
-      `Years range from 2012 to 2016.`,
-      `Popular tags include deep learning, computer vision, etc.`,
-    ]);
+    try {
+      const searchResults =  await searchPapers(query) ;
+      // Map the API response to ResearchPaper type
+      const mappedPapers = searchResults.papers.map((paper, _index) => ({
+        id: paper.paper_id,
+        title: paper.title,
+        authors: paper.authors.join(', '),
+        abstract: paper.abstract,
+        summary: paper.individual_summary,
+        publishedDate: paper.published,
+        pdfUrl: paper.pdf_url,
+        selected: false,
+        source: paper.source,
+        tags: [] // You can add tags from the consolidated_summary if needed
+      }));
+
+      setPapers(mappedPapers);
+      setSearchPerformed(true);
+      
+      // Create summary from the consolidated_summary
+      setSummary(searchResults?.consolidated_summary);
+      
+    } catch (error) {
+      console.error('Search failed:', error);
+      setPapers([]);
+      setSummary('Search failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const toggleSelection = (id: string) =>
@@ -36,6 +57,6 @@ export function usePapers() {
     search,
     toggleSelection,
     toggleAllSelection,
-    selectedCount: papers.filter(p => p.selected).length,
+    selectedCount: papers?.filter(p => p.selected).length ?? 0,
   };
 }
