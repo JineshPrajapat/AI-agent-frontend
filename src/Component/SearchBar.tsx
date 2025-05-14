@@ -1,39 +1,40 @@
-import { TextField, InputAdornment, Button, CircularProgress } from '@mui/material';
-import { Search } from 'lucide-react';
+// src/components/Search/SearchBar.tsx
+import { SearchBarProps } from "@/utils/types/searchTypes";
+import React from "react";
+// import { SearchBarProps } from "../../utils/types/searchTypes";
 
-interface SearchBarProps {
-  value: string;
-  onChange: (value: string) => void;
-  onSearch: () => void;
-  loading: boolean;
-}
+const SearchBar: React.FC<SearchBarProps> = ({
+  value,
+  onChange,
+  onSearch,
+  loading = false,
+  className = "",
+}) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearch(value);
+  };
 
-export default function SearchBar({ value, onChange, onSearch, loading }: SearchBarProps) {
   return (
-    <TextField
-      fullWidth
-      placeholder="Search research papers..."
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      onKeyPress={(e) => e.key === 'Enter' && onSearch()}
-      InputProps={{
-        startAdornment: (
-          <InputAdornment position="start">
-            <Search size={20} />
-          </InputAdornment>
-        ),
-        endAdornment: (
-          <InputAdornment position="end">
-            <Button 
-              onClick={onSearch}
-              disabled={loading || value.trim() === ''}
-              variant="contained"
-            >
-              {loading ? <CircularProgress size={24} /> : 'Search'}
-            </Button>
-          </InputAdornment>
-        )
-      }}
-    />
+    <form onSubmit={handleSubmit} className={`search-bar ${className}`}>
+      <div className="search-input-container">
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Search for research papers..."
+          disabled={loading}
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? (
+            <span className="spinner"></span>
+          ) : (
+            <svg /* search icon */></svg>
+          )}
+        </button>
+      </div>
+    </form>
   );
-}
+};
+
+export default SearchBar;

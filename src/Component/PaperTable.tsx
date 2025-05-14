@@ -1,45 +1,73 @@
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, Checkbox, TableBody } from '@mui/material';
-import PaperRow from './PaperRow';
-import { ResearchPaper } from '../utils/types/research';
+import React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Checkbox,
+} from "@mui/material";
 
-interface PaperTableProps {
-  papers: ResearchPaper[];
-  toggleAllSelection: (checked: boolean) => void;
-  toggleSelection: (id: string) => void;
-}
+const PaperTable = ({ papers, toggleSelection, toggleAllSelection }) => {
+  const handleCheckboxChange = (event, paper) => {
+    toggleSelection(paper.id, paper);
+  };
 
-export default function PaperTable({ papers, toggleAllSelection, toggleSelection }: PaperTableProps) {
-  const allSelected = papers.every(p => p.selected);
-  const someSelected = papers.some(p => p.selected && !allSelected);
+  const handleSelectAllClick = (event) => {
+    toggleAllSelection(event.target.checked);
+  };
+
+  const allSelected = papers.every((paper) => paper.isSelected);
+  const isSomeSelected = papers.some((paper) => paper.isSelected);
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer>
       <Table>
         <TableHead>
           <TableRow>
             <TableCell padding="checkbox">
               <Checkbox
-                indeterminate={someSelected}
+                indeterminate={isSomeSelected && !allSelected}
                 checked={allSelected}
-                onChange={(e) => toggleAllSelection(e.target.checked)}
+                onChange={handleSelectAllClick}
               />
             </TableCell>
-            <TableCell>PAPER</TableCell>
-            <TableCell>SUMMARY</TableCell>
-            <TableCell align="center">ACTIONS</TableCell>
+            <TableCell>Title</TableCell>
+            <TableCell>Authors</TableCell>
+            <TableCell>Abstract</TableCell>
+            {/* Add more headers based on your ResearchPaper interface if needed */}
           </TableRow>
         </TableHead>
         <TableBody>
-          {papers.map((paper, index) => (
-            <PaperRow 
+          {papers.map((paper) => (
+            <TableRow
               key={paper.id}
-              paper={paper}
-              onToggle={() => toggleSelection(paper.id)}
-              animationDelay={index}
-            />
+              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              style={{
+                backgroundColor: paper.isSelected ? "#f0f8ff" : "white",
+              }} // Example visual feedback
+            >
+              <TableCell padding="checkbox">
+                <Checkbox
+                  checked={paper.isSelected || false}
+                  onChange={(event) => handleCheckboxChange(event, paper)}
+                />
+              </TableCell>
+              <TableCell>{paper.title}</TableCell>
+              <TableCell>
+                {Array.isArray(paper.authors)
+                  ? paper.authors.join(", ")
+                  : paper.authors}
+              </TableCell>
+              <TableCell>{paper.abstract}</TableCell>
+              {/* Add more cells based on your ResearchPaper interface if needed */}
+            </TableRow>
           ))}
         </TableBody>
       </Table>
     </TableContainer>
   );
-}
+};
+
+export default PaperTable;
