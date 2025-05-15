@@ -11,4 +11,5 @@ export interface ResearchPaper {
   source: string;
   tags: string[];
   db_id:number;
+  is_processed_for_chat:boolean;
 }

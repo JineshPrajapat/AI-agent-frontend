@@ -3,14 +3,33 @@ import React, { useState } from "react";
 // import { chatWithPapers } from "../../services/ragApi";
 import { ApiError, ChatMessage } from "../../utils/types/apiTypes";
 import { chatWithPapers } from "../../services/ragApi";
+import { formatChatContent } from "@/utils/formatUtils";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  Divider,
+  Paper,
+  TextField,
+  Typography,
+  Alert,
+  IconButton,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+
+interface PaperMetadata {
+  db_id: number;
+  is_processed_for_chat: boolean;
+}
 
 interface ChatInterfaceProps {
-  paperIds: number[];
+  paperMetadata: PaperMetadata[];
   sessionId: number;
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
-  paperIds,
+  paperMetadata,
   sessionId,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -35,18 +54,26 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setIsLoading(true);
     setError(null); // Clear previous errors
 
+    const processedPaperIds = paperMetadata
+      .filter(p => p.is_processed_for_chat)
+      .map(p => p.db_id);
+
+    const unprocessedPaperIds = paperMetadata
+      .filter(p => !p.is_processed_for_chat)
+      .map(p => p.db_id);
+    const lastSessionId = messages.length > 0 ? messages[messages.length - 1].session_id : null;
+    console.log(unprocessedPaperIds);
+
     try {
-      const response = await chatWithPapers(
-        input, // query
-        paperIds, // selectedPaperIds
-        sessionId // chatSessionId
-      );
+      const response = lastSessionId !== null
+        ? await chatWithPapers(input, processedPaperIds, lastSessionId)
+        : await chatWithPapers(input, processedPaperIds);
 
       console.log("response", response);
 
       const assistantMessage: ChatMessage = {
         id: Date.now() + 1,
-        session_id: sessionId,
+        session_id: response.chat_session_id,
         role: "assistant",
         content: response.response,
         timestamp: new Date().toISOString(),
@@ -65,54 +92,81 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   return (
-    <div className="chat-interface">
-      <div className="chat-header">
-        <h3>Chatting with {paperIds.length} papers</h3>
-      </div>
+    <Container maxWidth="xl" sx={{ mt: 4 }}>
+      <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h5" gutterBottom>
+          Chatting with {paperMetadata.length} Papers
+        </Typography>
 
-      {/* Display error message if exists */}
-      {error && (
-        <div className="error-message">
-          {error}
-          <button onClick={() => setError(null)}>Dismiss</button>
-        </div>
-      )}
-
-      <div className="chat-messages">
-        {messages.map((msg) => (
-          <div key={msg.id} className={`message ${msg.role}`}>
-            <div className="message-content">{msg.content}</div>
-            {msg.role === "assistant" && msg.sources && (
-              <div className="message-sources">
-                <h4>Sources:</h4>
-                {Object.entries(msg.sources).map(([paperId, source]) => (
-                  <div key={paperId} className="source">
-                    <h5>{source.title}</h5>
-                    <p>{source.text.substring(0, 150)}...</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>  
-        ))}
-        {isLoading && (
-          <div className="message assistant loading">Thinking...</div>
+        {error && (
+          <Alert
+            severity="error"
+            action={
+              <IconButton color="inherit" size="small" onClick={() => setError(null)}>
+                <CloseIcon fontSize="inherit" />
+              </IconButton>
+            }
+            sx={{ mb: 2 }}
+          >
+            {error}
+          </Alert>
         )}
-      </div>
 
-      <form onSubmit={handleSendMessage} className="chat-input">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask about the selected papers..."
-          disabled={isLoading}
-        />
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? "Sending..." : "Send"}
-        </button>
-      </form>
-    </div>
+        <Box sx={{ maxHeight: 400, overflowY: "auto", mb: 2 }}>
+          {messages.map((msg) => (
+            <Box
+              key={msg.id}
+              sx={{
+                mb: 2,
+                p: 2,
+                borderRadius: 2,
+                bgcolor: msg.role === "user" ? "primary.light" : "grey.100",
+              }}
+            >
+              <Typography variant="body1">{formatChatContent(msg.content)}</Typography>
+              {msg.role === "assistant" && msg.sources && (
+                <Box mt={1}>
+                  <Typography variant="subtitle2">Sources:</Typography>
+                  {Object.entries(msg.sources).map(([paperId, source]) => (
+                    <Box key={paperId} sx={{ pl: 1, mt: 0.5 }}>
+                      <Typography variant="body2" fontWeight="bold">{source.title}</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {source.text.slice(0, 150)}...
+                      </Typography>
+                      <Divider sx={{ my: 1 }} />
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Box>
+          ))}
+          {isLoading && (
+            <Box sx={{ textAlign: "center", my: 2 }}>
+              <CircularProgress size={24} />
+              <Typography variant="body2" color="text.secondary">
+                Thinking...
+              </Typography>
+            </Box>
+          )}
+        </Box>
+
+        <form onSubmit={handleSendMessage}>
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <TextField
+              fullWidth
+              placeholder="Ask about the selected papers..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={isLoading}
+              variant="outlined"
+            />
+            <Button type="submit" variant="contained" disabled={isLoading}>
+              Send
+            </Button>
+          </Box>
+        </form>
+      </Paper>
+    </Container>
   );
 };
 

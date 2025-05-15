@@ -13,10 +13,10 @@ export function usePapers() {
   const search = async (query: string) => {
     setLoading(true);
     try {
-      const searchResults =  await searchPapers(query) ;
+      const searchResults = await searchPapers(query);
       // Map the API response to ResearchPaper type
       const mappedPapers = searchResults.papers.map((paper, _index) => ({
-        db_id:paper.db_id,
+        db_id: paper.db_id,
         id: paper.paper_id,
         title: paper.title,
         authors: paper.authors.join(', '),
@@ -24,6 +24,7 @@ export function usePapers() {
         summary: paper.individual_summary,
         publishedDate: paper.published,
         pdfUrl: paper.pdf_url,
+        is_processed_for_chat: paper.is_processed_for_chat,
         selected: false,
         source: paper.source,
         tags: [] // You can add tags from the consolidated_summary if needed
@@ -31,10 +32,10 @@ export function usePapers() {
 
       setPapers(mappedPapers);
       setSearchPerformed(true);
-      
+
       // Create summary from the consolidated_summary
       setSummary(searchResults?.consolidated_summary);
-      
+
     } catch (error) {
       console.error('Search failed:', error);
       setPapers([]);
@@ -50,7 +51,12 @@ export function usePapers() {
   const toggleAllSelection = (checked: boolean) =>
     setPapers(prev => prev.map(p => ({ ...p, selected: checked })));
 
-  const paperIds:number[] = papers.filter(p => p.selected).map(p => p.db_id) || [11,12];         // selectrde paper ids returned
+  const paperMetadata = papers
+    .filter(p => p.selected)
+    .map(p => ({
+      db_id: p.db_id,
+      is_processed_for_chat: p.is_processed_for_chat
+    }));         
 
   return {
     papers,
@@ -61,6 +67,6 @@ export function usePapers() {
     toggleSelection,
     toggleAllSelection,
     selectedCount: papers?.filter(p => p.selected).length ?? 0,
-    paperIds
+    paperMetadata
   };
 }

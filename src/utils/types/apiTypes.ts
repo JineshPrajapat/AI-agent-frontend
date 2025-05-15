@@ -65,7 +65,7 @@ export interface PaperStatusResponse {
 export interface ChatRequest {
   query: string;
   selected_paper_ids: number[];
-  chat_session_id: number | null;
+  session_id?: number;
 }
 
 export interface ChatSourceChunk {
@@ -101,7 +101,7 @@ export interface ChatSession {
 
 export interface ChatMessage {
   id: number;
-  session_id: number;
+  session_id: number | null;
   timestamp: string;
   role: "user" | "assistant";
   content: string;

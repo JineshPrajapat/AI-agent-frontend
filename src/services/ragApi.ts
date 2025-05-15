@@ -11,13 +11,13 @@ import {
 export const chatWithPapers = async (
     query: string,
     selectedPaperIds: number[],
-    chatSessionId: number | null = null
+    session_id?:number,
 ): Promise<ChatResponse> => {
     try {
         const request: ChatRequest = {
             query,
             selected_paper_ids: selectedPaperIds,
-            chat_session_id: chatSessionId,
+            ...(session_id !== undefined && { session_id })
         };
         const access_token = localStorage.getItem('accessToken')
         const response = await api.post("/rag/chat", request, {

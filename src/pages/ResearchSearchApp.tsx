@@ -13,7 +13,7 @@ export default function ResearchSearchApp() {
     const {
         papers, loading, search, summary,
         searchPerformed, toggleSelection,
-        toggleAllSelection, selectedCount, paperIds
+        toggleAllSelection, selectedCount, paperMetadata
     } = usePapers();
 
     const [query, setQuery] = useState('');
@@ -21,7 +21,6 @@ export default function ResearchSearchApp() {
 
 
     const handleChatOpen = () => {
-        console.log("paperIds", paperIds)
         if (selectedCount > 0) {
             setIsChatOpen(true);
         } else {
@@ -80,7 +79,7 @@ export default function ResearchSearchApp() {
             )}
 
             <Modal isOpen={isChatOpen} onClose={closeChat}>
-                <ChatInterface paperIds={paperIds} sessionId={Date.now()} />
+                <ChatInterface paperMetadata={paperMetadata} sessionId={Date.now()} />
             </Modal>
 
         </Box>
