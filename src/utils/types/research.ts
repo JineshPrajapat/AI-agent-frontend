@@ -10,4 +10,5 @@ export interface ResearchPaper {
   selected: boolean;
   source: string;
   tags: string[];
+  db_id:number;
 }

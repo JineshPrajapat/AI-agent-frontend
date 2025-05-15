@@ -16,6 +16,7 @@ export const login = createAsyncThunk(
             if (access_token && user_id && refresh_token) {
                 localStorage.setItem("accessToken", access_token);
                 localStorage.setItem("refresh_token", refresh_token);
+                window.location.replace("http://localhost:5173");
                 toast.success("Login Successfully");
                 return { access_token, user_id, username }
             }
@@ -78,7 +79,7 @@ export const register = createAsyncThunk(
             if (response.status === 201) {
                 localStorage.setItem("accessToken ", response.data?.accessToken);
                 toast.success("Registered successfully, Login now");
-                window.location.href
+                window.location.href = "http://localhost:5173";
                 return response.data?.accessToken ?? null;
             } else {
                 return rejectWithValue(

@@ -6,25 +6,32 @@ import { usePapers } from '../hooks/usePapers';
 import { FileText } from 'lucide-react';
 import { useState } from 'react';
 import FeatureHighlights from '@/Component/FeatureHighlights';
+import Modal from '@/Component/common/Modal';
+import ChatInterface from '@/Component/chat/ChatInterface';
 
 export default function ResearchSearchApp() {
     const {
         papers, loading, search, summary,
         searchPerformed, toggleSelection,
-        toggleAllSelection, selectedCount
+        toggleAllSelection, selectedCount, paperIds
     } = usePapers();
 
     const [query, setQuery] = useState('');
-  const [_isChatOpen, setIsChatOpen] = useState(false);
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
 
     const handleChatOpen = () => {
-    if (selectedCount > 0) {
-      setIsChatOpen(true);
-    } else {
-      alert("Please select at least one paper to start a chat.");
-    }
-  };
+        console.log("paperIds", paperIds)
+        if (selectedCount > 0) {
+            setIsChatOpen(true);
+        } else {
+            alert("Please select at least one paper to start a chat.");
+        }
+    };
+
+    const closeChat = () => {
+        setIsChatOpen(false);
+    };
 
     return (
         <Box maxWidth="1400px" mx="auto" p={3}>
@@ -71,6 +78,10 @@ export default function ResearchSearchApp() {
             ) : (
                 <FeatureHighlights />
             )}
+
+            <Modal isOpen={isChatOpen} onClose={closeChat}>
+                <ChatInterface paperIds={paperIds} sessionId={Date.now()} />
+            </Modal>
 
         </Box>
     );

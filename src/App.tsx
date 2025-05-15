@@ -63,13 +63,8 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/" element={<ResearchSearchApp />} />
               <Route path="/search" element={<SearchResultsPage />} />
-              <Route path="/chat/:sessionId" element={
-                  <ChatPage />
-                }
-              />
+              <Route path="/chat/:sessionId" element={ <ChatPage />}/>
             </Routes>
-
-
           </>
         )
       }

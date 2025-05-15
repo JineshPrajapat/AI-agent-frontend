@@ -16,6 +16,7 @@ export function usePapers() {
       const searchResults =  await searchPapers(query) ;
       // Map the API response to ResearchPaper type
       const mappedPapers = searchResults.papers.map((paper, _index) => ({
+        db_id:paper.db_id,
         id: paper.paper_id,
         title: paper.title,
         authors: paper.authors.join(', '),
@@ -49,6 +50,8 @@ export function usePapers() {
   const toggleAllSelection = (checked: boolean) =>
     setPapers(prev => prev.map(p => ({ ...p, selected: checked })));
 
+  const paperIds:number[] = papers.filter(p => p.selected).map(p => p.db_id) || [11,12];         // selectrde paper ids returned
+
   return {
     papers,
     loading,
@@ -58,5 +61,6 @@ export function usePapers() {
     toggleSelection,
     toggleAllSelection,
     selectedCount: papers?.filter(p => p.selected).length ?? 0,
+    paperIds
   };
 }
