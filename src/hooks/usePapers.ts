@@ -7,7 +7,7 @@ import { searchPapers } from '@/services/paperApi';
 export function usePapers() {
   const [papers, setPapers] = useState<ResearchPaper[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchPerformed, setSearchPerformed] = useState(true);
+  const [searchPerformed, setSearchPerformed] = useState(false);
   const [summary, setSummary] = useState<string>('');
 
   const search = async (query: string) => {
