@@ -3,7 +3,7 @@ import { Typography } from "@mui/material";
 
 export const formatChatContent = (rawContent: string): React.ReactNode => {
   // Remove citation references like [2504.19997v1]
-  const cleaned = rawContent.replace(/\[\d{4}\.\d{5}v\d+\]/g, "");
+  const cleaned = rawContent;
 
   // Split into lines (if any), or manually chunk bullets
   const bulletRegex = /\*\*\s*(.+?)\s*\*\*:\s*/g;
