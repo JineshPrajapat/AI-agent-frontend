@@ -50,7 +50,7 @@ const Landing: React.FC = () => {
                         mb: 3,
                     }}
                 >
-                    AI Agent Assistant
+                    Lexify: Your AI Research Assistant
                 </Typography>
 
                 <Typography
